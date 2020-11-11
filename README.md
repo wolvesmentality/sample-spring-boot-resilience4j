@@ -1,1 +1,1 @@
-Sample spring boot resiliencej project 
+Sample spring boot resilience4j project 
