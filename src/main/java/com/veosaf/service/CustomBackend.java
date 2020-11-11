@@ -2,6 +2,7 @@ package com.veosaf.service;
 
 import com.veosaf.service.exception.CustomBusinessException;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import io.vavr.control.Try;
@@ -26,16 +27,6 @@ public class CustomBackend {
     }
 
     @Bulkhead(name = CUSTOM_BACKEND)
-    @TimeLimiter(name = CUSTOM_BACKEND, fallbackMethod = "customFallback")
-    @CircuitBreaker(name = CUSTOM_BACKEND, fallbackMethod = "customFallback")
-    public CompletableFuture<String> unhealthyBackendWithTimeout() {
-        return CompletableFuture.supplyAsync(() -> {
-            Try.run(() -> Thread.sleep(2000));
-            return SUCCESS_MESSAGE;
-        });
-    }
-
-    @Bulkhead(name = CUSTOM_BACKEND)
     @TimeLimiter(name = CUSTOM_BACKEND)
     @CircuitBreaker(name = CUSTOM_BACKEND, fallbackMethod = "customFallback")
     public CompletableFuture<String> healthyBackendWithCustomBusinessException() {
@@ -47,19 +38,36 @@ public class CustomBackend {
     @Bulkhead(name = CUSTOM_BACKEND)
     @TimeLimiter(name = CUSTOM_BACKEND)
     @CircuitBreaker(name = CUSTOM_BACKEND, fallbackMethod = "customFallback")
-    public CompletableFuture<String> unhealthyBackendWithErrorException() {
+    public CompletableFuture<String> unhealthyBackendOnTimeout() {
         return CompletableFuture.supplyAsync(() -> {
-            throw new IllegalArgumentException("Business exception");
+            Try.run(() -> Thread.sleep(2000));
+            return SUCCESS_MESSAGE;
         });
     }
 
+    @Bulkhead(name = CUSTOM_BACKEND)
+    @TimeLimiter(name = CUSTOM_BACKEND)
+    @CircuitBreaker(name = CUSTOM_BACKEND, fallbackMethod = "customFallback")
+    public CompletableFuture<String> unhealthyOnUnexpectedError() {
+        throw new IllegalArgumentException("Unexpected exception");
+    }
+
+
     private CompletableFuture<String> customFallback(Throwable ex) {
-        return CompletableFuture.completedFuture("Enter Recovery Mode : " + ex.toString());
+        log.error("Enter Recovery Mode on error", ex);
+        return CompletableFuture.completedFuture("Default recover");
     }
 
     private CompletableFuture<String> customFallback(TimeoutException ex) {
-        return CompletableFuture.failedFuture(ex);
+        log.error("Enter Recovery Mode on error", ex);
+        return CompletableFuture.completedFuture("Recovered TimeoutException");
     }
+
+    private CompletableFuture<String> customFallback(CallNotPermittedException ex) {
+        log.error("Enter Recovery Mode on error", ex);
+        return CompletableFuture.completedFuture("Recovered CallNotPermittedException");
+    }
+
 
     private CompletableFuture<String> customFallback(CustomBusinessException ex) {
         // It is an ignored exception (see yaml conf)

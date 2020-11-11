@@ -39,7 +39,6 @@ resilience4j.circuitbreaker:
       failureRateThreshold: 50
       eventConsumerBufferSize: 10
       ignoreExceptions:
-        - java.lang.IllegalArgumentException
         - com.veosaf.service.exception.CustomBusinessException
   instances:
     customBackend:

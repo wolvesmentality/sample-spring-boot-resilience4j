@@ -33,19 +33,19 @@ public class CustomBackendTest {
     }
 
     @Test
-    public void shouldFailAfterTimeout() {
-        assertNotEquals(SUCCESS_MESSAGE, getResponse(customBackend.unhealthyBackendWithTimeout()));
+    public void shouldRecoverOnTimeout() {
+        assertNotEquals(SUCCESS_MESSAGE, getResponse(customBackend.unhealthyBackendOnTimeout()));
     }
 
     @Test
-    public void shouldThrowCustomBusinessException() {
+    public void shouldNotRecoverFromBusinessException() {
         Assertions.assertThrows(CustomBusinessException.class,
                 () -> getResponse(customBackend.healthyBackendWithCustomBusinessException()));
     }
 
     @Test
-    public void shouldRecoverFromNotBusinessException() {
-        assertNotEquals(SUCCESS_MESSAGE, getResponse(customBackend.unhealthyBackendWithErrorException()));
+    public void shouldRecoverFromUnexpectedError() {
+        assertNotEquals(SUCCESS_MESSAGE, getResponse(customBackend.unhealthyOnUnexpectedError()));
     }
 
 

@@ -15,12 +15,22 @@ public class BackendController {
 
     @GetMapping("timeout")
     public String unhealthyBackendWithTimeout() {
-        return customBackend.unhealthyBackendWithTimeout().join();
+        return customBackend.unhealthyBackendOnTimeout().join();
+    }
+
+    @GetMapping("failure")
+    public String unhealthyOnUnexpectedError() {
+        return customBackend.unhealthyOnUnexpectedError().join();
     }
 
     @GetMapping("success")
     public String success() {
         return customBackend.healthyBackend().join();
+    }
+
+    @GetMapping("business-error")
+    public String successOnBusinessError() {
+        return customBackend.healthyBackendWithCustomBusinessException().join();
     }
 
 }
