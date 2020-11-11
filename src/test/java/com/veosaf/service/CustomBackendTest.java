@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import static com.veosaf.service.CustomBackend.SUCCESS_MESSAGE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 
@@ -25,6 +26,11 @@ public class CustomBackendTest {
 
     @Autowired
     private CustomBackend customBackend;
+
+    @Test
+    public void shouldSuccess() {
+        assertEquals(SUCCESS_MESSAGE, getResponse(customBackend.healthyBackend()));
+    }
 
     @Test
     public void shouldFailAfterTimeout() {
