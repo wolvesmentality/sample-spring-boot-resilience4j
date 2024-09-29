@@ -53,23 +53,23 @@ public class CustomBackend {
     }
 
 
-    private CompletableFuture<String> customFallback(Throwable ex) {
+    private CompletableFuture<String> customFallback(final Throwable ex) {
         log.error("Enter Recovery Mode on error", ex);
         return CompletableFuture.completedFuture("Default recover");
     }
 
-    private CompletableFuture<String> customFallback(TimeoutException ex) {
+    private CompletableFuture<String> customFallback(final TimeoutException ex) {
         log.error("Enter Recovery Mode on error", ex);
         return CompletableFuture.completedFuture("Recovered TimeoutException");
     }
 
-    private CompletableFuture<String> customFallback(CallNotPermittedException ex) {
+    private CompletableFuture<String> customFallback(final CallNotPermittedException ex) {
         log.error("Enter Recovery Mode on error", ex);
         return CompletableFuture.completedFuture("Recovered CallNotPermittedException");
     }
 
 
-    private CompletableFuture<String> customFallback(CustomBusinessException ex) {
+    private CompletableFuture<String> customFallback(final CustomBusinessException ex) {
         // It is an ignored exception (see yaml conf)
         // It is ignored and neither count as a failure nor success
         // No Recovery Mode for business exception
